@@ -1,12 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Quizy</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="js/main.js" defer></script>
 </head>
 <body>
-    <h1>Quizz</h1>
-    <h2>tesr</h2>
+    <div id="home-screen" class="screen active">
+        <div class="header">
+            
+            <h1>Home</h1>
+        </div>
+        <div class="home-screen">
+            <img src="images/logo-quizy.png" alt="Quizy" class="logo">
+           
+            <button class="random-quiz-btn">Random Quiz</button>
+        </div>
+    </div>
+
+    <div id="categories-screen" class="screen">
+        <div class="header">
+            <button class="back-button">←</button>
+            <h1>Categories</h1>
+        </div>
+        <div class="categories-list">
+            <div class="category-item">
+                <span class="category-icon">🎯</span>
+                General Knowledge
+            </div>
+            <div class="category-item">
+                <span class="category-icon">📚</span>
+                Entertainment: Books
+            </div>
+            <div class="category-item">
+                <span class="category-icon">🎬</span>
+                Entertainment: Film
+            </div>
+            <div class="category-item">
+                <span class="category-icon">🎵</span>
+                Entertainment: Music
+            </div>
+            <div class="category-item">
+                <span class="category-icon">🎭</span>
+                Entertainment: Musicals & Theatres
+            </div>
+            <div class="category-item">
+                <span class="category-icon">📺</span>
+                Entertainment: Television
+            </div>
+            <div class="category-item">
+                <span class="category-icon">🎮</span>
+                Entertainment: Video Games
+            </div>
+            <div class="category-item">
+                <span class="category-icon">♟️</span>
+                Entertainment: Board Games
+            </div>
+            <div class="category-item">
+                <span class="category-icon">🔬</span>
+                Science & Nature
+            </div>
+            <div class="category-item">
+                <span class="category-icon">🌍</span>
+                Science: Computers
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-screen" class="screen">
+        <div class="header">
+            <button class="back-button">←</button>
+            <h1>Settings</h1>
+        </div>
+        <div class="settings-screen">
+            <label class="settings-label">Please enter a username:</label>
+            <input type="text" class="settings-input" placeholder="Guest" value="Guest">
+            <label class="settings-label">Please enter number of question per quiz:</label>
+            <input type="number" class="settings-input" value="10" min="1">
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="screen">
+        <div class="header">
+            <button class="back-button">←</button>
+            <h1>Quiz</h1>
+        </div>
+        <div class="quiz-container">
+            <div class="question">
+                Who is the main protagonist in the 1985 film, Back to the Future?
+            </div>
+            <div class="answer-options">
+                <label class="answer-option">
+                    <input type="radio" name="answer" class="answer-radio">
+                    Emmett 'Doc' Brown
+                </label>
+                <label class="answer-option">
+                    <input type="radio" name="answer" class="answer-radio">
+                    George McFly
+                </label>
+                <label class="answer-option">
+                    <input type="radio" name="answer" class="answer-radio">
+                    Biff Tannen
+                </label>
+                <label class="answer-option">
+                    <input type="radio" name="answer" class="answer-radio">
+                    Marty McFly
+                </label>
+            </div>
+            <button class="next-button">Next Question</button>
+            <p class="progress-text">You have a score of 5 out of 10 questions</p>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="showScreen('home-screen')">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showScreen('categories-screen')">
+            <span class="nav-icon">📋</span>
+            <span>Categories</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showScreen('settings-screen')">
+            <span class="nav-icon">⚙️</span>
+            <span>Settings</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showScreen('leaderboard-screen')">
+            <span class="nav-icon">🏆</span>
+            <span>Leaderboard</span>
+        </a>
+    </nav>
+
+    <script>
+        // Fonction pour afficher un écran spécifique
+        function showScreen(screenId) {
+            // Cacher tous les écrans
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            // Afficher l'écran demandé
+            document.getElementById(screenId).classList.add('active');
+
+            // Mettre à jour la navigation active
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.nav-item[onclick="showScreen('${screenId}')"]`)?.classList.add('active');
+        }
+
+        // Ajouter les gestionnaires d'événements pour la navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const screenId = item.getAttribute('onclick').match(/'([^']+)'/)[1];
+                showScreen(screenId);
+            });
+        });
+
+        // Gestionnaire pour le bouton retour
+        document.querySelectorAll('.back-button').forEach(button => {
+            button.addEventListener('click', () => {
+                showScreen('home-screen'); // Retour à l'écran principal, ajustez si nécessaire
+            });
+        });
+
+        // Initialisation des paramètres depuis LocalStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            const settings = JSON.parse(localStorage.getItem('quizSettings')) || {
+                username: 'Guest',
+                questionCount: 10
+            };
+            document.querySelectorAll('.settings-input')[0].value = settings.username;
+            document.querySelectorAll('.settings-input')[1].value = settings.questionCount;
+        });
+    </script>
 </body>
 </html>
