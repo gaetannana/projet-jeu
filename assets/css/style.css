@@ -1,221 +1,34 @@
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
+body {
+    margin: 20px;
+    font-family: sans-serif;
+}
 
-        :root {
-            --primary: #000063;
-            --secondary: #d46de5;
-            --dark-green: #001200;
-            --white: #ffffff;
-            --gray: #f0f0f0;
-            --dark-gray: #333;
-        }
+div {
+    margin-bottom: 20px;
+    padding: 10px;
+}
 
-        body {
-            background-color: var(--white);
-            min-height: 100vh;
-            max-width: 430px;
-            margin: 0 auto;
-            position: relative;
-            font-size: 16px;
-        }
+h1, h2, p {
+    margin: 10px 0;
+}
 
-        .header {
-            padding: 15px;
-            background: var(--white);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+label {
+    display: inline-block;
+    margin-right: 10px;
+}
 
-        .header h1 {
-            color: var(--dark-gray);
-            font-size: 18px;
-            font-weight: bold;
-        }
+input, select {
+    margin: 5px 0;
+    padding: 5px;
+}
 
-        .back-button {
-            position: absolute;
-            left: 15px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--dark-gray);
-        }
+button {
+    margin: 5px;
+    padding: 10px;
+}
 
-        .home-screen {
-            background-color: var(--secondary);
-            height: calc(100vh - 120px); /* Ajusté pour inclure les deux barres */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: var(--white);
-        }
-
-        .logo {
-            width: 150px;
-            margin-bottom: 20px;
-        }
-
-        .home-title {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        .random-quiz-btn {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .categories-list {
-            padding: 15px;
-        }
-
-        .category-item {
-            background: var(--white);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            color: var(--dark-gray);
-        }
-
-        .category-icon {
-            margin-right: 15px;
-            font-size: 20px;
-        }
-
-        .settings-screen {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .settings-label {
-            color: var(--dark-gray);
-            font-size: 14px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .settings-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            color: var(--dark-gray);
-        }
-
-        .quiz-container {
-            padding: 20px;
-        }
-
-        .question {
-            font-size: 16px;
-            color: var(--dark-gray);
-            margin-bottom: 20px;
-        }
-
-        .answer-option {
-            background: var(--white);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .answer-radio {
-            margin-right: 10px;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #ddd;
-            border-radius: 50%;
-            appearance: none;
-            cursor: pointer;
-        }
-
-        .answer-radio:checked {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .next-button {
-            background: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 20px;
-            width: 100%;
-            font-size: 16px;
-        }
-
-        .progress-text {
-            font-size: 12px;
-            color: var(--dark-gray);
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 430px;
-            margin: 0 auto;
-            background: var(--secondary);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--white);
-            text-decoration: none;
-            font-size: 12px;
-            padding: 5px;
-        }
-
-        .nav-item.active {
-            border-top: 2px solid var(--white);
-            color: var(--white);
-        }
-
-        .nav-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
+#answers button {
+    display: block;
+    margin: 5px 0;
+    padding: 10px;
+}
