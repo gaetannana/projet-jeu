@@ -59,10 +59,10 @@ input, select {
     display: inline-block;
     padding: 12px 24px;
     font-size: 16px;
-    background-color: #046de5;
+    background-color: #000063;
     color: #ffffff;
     border: none;
-    border-radius: 5px;
+    border-radius:5px;
     margin: 10px 5px;
     cursor: pointer;
 }
@@ -78,7 +78,7 @@ input, select {
     font-size: 16px;
     background-color: #ffffff;
     color: #000063;
-    border: 2px solid #046de5;
+    border: 2px solid #000063;
     border-radius: 5px;
     margin: 10px 0;
     cursor: default;
@@ -92,4 +92,20 @@ input, select {
 
 #answers {
     margin: 20px 0;
+}
+
+#question-preview {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#question-preview p {
+    margin: 10px 0;
+}
+
+#question-preview button {
+    margin-top: 15px;
 }
