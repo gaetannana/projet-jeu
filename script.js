@@ -1,244 +1,330 @@
 let configQuiz = {
-    pseudo: "Invité",
+    pseudo: "Joueur Anonyme",
     nombreQuestions: 10,
-    timer: 10,
-    difficulte: "easy",
-    meilleursScores: {}
+    difficulty: "hard",
+    timerDuration: 30
 };
-let listeCategories = [];
-let questionsQuiz = [];
-let indexQuestionCourante = 0;
+let categories = [];
+let questions = [];
+let currentQuestionIndex = 0;
 let score = 0;
-let timerId = null;
+let selectedAnswer = null;
+let timer;
+let timeLeft;
 
 document.addEventListener("DOMContentLoaded", () => {
-    chargerParametres();
-    recupererCategories();
-    attacherEvenements();
-    afficherEcran("home-screen");
+    loadSettings();
+    fetchCategories();
+    showScreen("home-screen");
 });
 
-function attacherEvenements() {
-    document.getElementById("random-quiz-btn").addEventListener("click", () => {
-        document.getElementById("category-select").value = "";
-        lancerQuiz();
+function showScreen(screenId) {
+    document.querySelectorAll(".screen").forEach(screen => {
+        screen.style.display = "none";
     });
-    document.getElementById("category-btn").addEventListener("click", () => afficherEcran("categories-screen"));
-    document.getElementById("settings-btn").addEventListener("click", () => afficherEcran("settings-screen"));
-    document.getElementById("save-btn").addEventListener("click", () => {
-        sauvegarderParametres();
-        afficherEcran("home-screen");
-    });
-    document.getElementById("start-btn").addEventListener("click", lancerQuiz);
-    document.getElementById("next-btn").addEventListener("click", passerQuestionSuivante);
-    document.getElementById("leaderboard-btn").addEventListener("click", () => afficherEcran("leaderboard-screen"));
-    document.getElementById("back-btn").addEventListener("click", () => afficherEcran("home-screen"));
+    document.getElementById(screenId).style.display = "block";
+
+    if (screenId === "categories-screen") {
+        saveSettings();
+        displayCategories();
+    } else if (screenId === "quiz-screen") {
+        document.getElementById("submit-answer-btn").style.display = "block";
+        document.getElementById("next-question-btn").style.display = "none";
+        document.getElementById("end-quiz-btn").style.display = "none";
+        document.getElementById("feedback").style.display = "none";
+    }
 }
 
-function afficherEcran(idEcran) {
-    document.querySelectorAll(".screen").forEach(ecran => ecran.classList.remove("active"));
-    document.getElementById(idEcran).classList.add("active");
-    if (idEcran === "categories-screen") afficherCategories();
-    else if (idEcran === "quiz-screen") afficherQuestion();
-    else if (idEcran === "leaderboard-screen") afficherLeaderboardDetails();
-    else if (idEcran === "result-screen") afficherResultat();
+function saveSettings() {
+    const usernameInput = document.getElementById("username").value.trim();
+    const numQuestionsInput = parseInt(document.getElementById("num-questions").value);
+    const difficultyInput = document.getElementById("difficulty").value;
+    const timerDurationInput = parseInt(document.getElementById("timer-duration").value);
+
+    configQuiz.pseudo = usernameInput || "Joueur Anonyme";
+    configQuiz.nombreQuestions = isNaN(numQuestionsInput) || numQuestionsInput < 1 ? 10 : numQuestionsInput;
+    configQuiz.difficulty = difficultyInput || "hard";
+    configQuiz.timerDuration = isNaN(timerDurationInput) || timerDurationInput < 1 ? 30 : timerDurationInput;
+
+    localStorage.setItem("quizConfig", JSON.stringify(configQuiz));
+    alert("Paramètres sauvegardés !");
 }
 
-function sauvegarderParametres() {
-    configQuiz.pseudo = document.getElementById("username").value || "Invité";
-    configQuiz.nombreQuestions = parseInt(document.getElementById("num-questions").value) || 10;
-    configQuiz.timer = parseInt(document.getElementById("timer-duration").value) || 10;
-    configQuiz.difficulte = document.getElementById("difficulty").value || "easy";
-    localStorage.setItem("configQuiz", JSON.stringify(configQuiz));
-}
-
-function chargerParametres() {
-    const configSauvegardee = localStorage.getItem("configQuiz");
-    if (configSauvegardee) {
-        configQuiz = JSON.parse(configSauvegardee);
-        configQuiz.meilleursScores = configQuiz.meilleursScores || {};
+function loadSettings() {
+    try {
+        const savedConfig = localStorage.getItem("quizConfig");
+        if (savedConfig) {
+            const parsedConfig = JSON.parse(savedConfig);
+            configQuiz.pseudo = parsedConfig.pseudo || "Joueur Anonyme";
+            configQuiz.nombreQuestions = parsedConfig.nombreQuestions || 10;
+            configQuiz.difficulty = parsedConfig.difficulty || "hard";
+            configQuiz.timerDuration = parsedConfig.timerDuration || 30;
+        }
+    } catch (error) {
+        console.error("Erreur lors du chargement des paramètres:", error);
     }
     document.getElementById("username").value = configQuiz.pseudo;
     document.getElementById("num-questions").value = configQuiz.nombreQuestions;
-    document.getElementById("timer-duration").value = configQuiz.timer;
-    document.getElementById("difficulty").value = configQuiz.difficulte;
+    document.getElementById("difficulty").value = configQuiz.difficulty;
+    document.getElementById("timer-duration").value = configQuiz.timerDuration;
 }
 
-async function recupererCategories() {
+async function fetchCategories() {
+    showScreen("loading-screen");
     try {
-        const reponse = await fetch("https://opentdb.com/api_category.php");
-        const donnees = await reponse.json();
-        listeCategories = donnees.trivia_categories;
-        afficherCategories();
-    } catch (erreur) {
-        console.error(erreur);
-        alert("Erreur lors du chargement des catégories.");
+        const response = await fetch("https://opentdb.com/api_category.php", { cache: "no-cache" });
+        if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+        const data = await response.json();
+        categories = data.trivia_categories;
+        showScreen("home-screen");
+    } catch (error) {
+        console.error("Erreur lors de la récupération des catégories:", error);
+        alert("Impossible de charger les catégories. Vérifiez votre connexion.");
+        showScreen("home-screen");
     }
 }
 
-function afficherCategories() {
-    const menuCategories = document.getElementById("category-select");
-    menuCategories.innerHTML = '<option value="">Choisir une catégorie</option>';
-    listeCategories.forEach(categorie => {
+function displayCategories() {
+    const categorySelect = document.getElementById("category-select");
+    categorySelect.innerHTML = '<option value="">Choisir une catégorie</option>';
+    categories.forEach(category => {
         const option = document.createElement("option");
-        option.value = categorie.id;
-        option.textContent = categorie.name;
-        menuCategories.appendChild(option);
+        option.value = category.id;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
     });
 }
 
-async function lancerQuiz() {
-    const categorieChoisie = document.getElementById("category-select").value;
-    let urlApi = `https://opentdb.com/api.php?amount=${configQuiz.nombreQuestions}&difficulty=${configQuiz.difficulte}&type=multiple`;
-    if (categorieChoisie) urlApi += `&category=${categorieChoisie}`;
-    await recupererQuestions(urlApi);
+function startQuiz() {
+    score = 0;
+    currentQuestionIndex = 0;
+    selectedAnswer = null;
+    const selectedCategory = document.getElementById("category-select").value;
+    let apiUrl = `https://opentdb.com/api.php?amount=${configQuiz.nombreQuestions}&difficulty=${configQuiz.difficulty}&type=multiple`;
+    if (selectedCategory) {
+        apiUrl += `&category=${selectedCategory}`;
+    }
+    fetchQuestions(apiUrl);
 }
 
-async function recupererQuestions(urlApi) {
+async function fetchQuestions(apiUrl) {
+    showScreen("loading-screen");
     try {
-        const reponse = await fetch(urlApi);
-        const donnees = await reponse.json();
-        if (donnees.response_code === 0) {
-            questionsQuiz = donnees.results;
-            indexQuestionCourante = 0;
-            score = 0;
-            afficherEcran("quiz-screen");
-            document.getElementById("username-display").textContent = `Joueur: ${configQuiz.pseudo}`;
-        } else {
-            alert("Échec du chargement des questions.");
+        const response = await fetch(apiUrl, { cache: "no-cache" });
+        if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+        const data = await response.json();
+
+        if (data.response_code !== 0) {
+            let errorMsg = "Erreur lors du chargement des questions: ";
+            switch (data.response_code) {
+                case 1:
+                    errorMsg += "Pas assez de questions disponibles.";
+                    break;
+                case 2:
+                    errorMsg += "Paramètres invalides.";
+                    break;
+                case 3:
+                case 4:
+                    errorMsg += "Problème de session. Réessayez.";
+                    break;
+                default:
+                    errorMsg += "Erreur inconnue.";
+            }
+            throw new Error(errorMsg);
         }
-    } catch (erreur) {
-        console.error(erreur);
-        alert("Erreur lors du chargement des questions.");
+
+        questions = data.results;
+        currentQuestionIndex = 0;
+        showScreen("quiz-screen");
+        document.getElementById("username-display").textContent = `Joueur: ${configQuiz.pseudo}`;
+        displayQuestion();
+    } catch (error) {
+        console.error("Erreur lors de la récupération des questions:", error);
+        alert(error.message || "Erreur lors du chargement des questions.");
+        showScreen("home-screen");
     }
 }
 
-function afficherQuestion() {
-    if (indexQuestionCourante >= questionsQuiz.length) {
-        sauvegarderMeilleurScore();
-        afficherResultat();
+function displayQuestion() {
+    document.getElementById("feedback").style.display = "none";
+    const currentQuestion = questions[currentQuestionIndex];
+
+    document.getElementById("question-number").textContent = `Question ${currentQuestionIndex + 1} / ${questions.length}`;
+    document.getElementById("question-text").textContent = decodeHtml(currentQuestion.question);
+
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+    let answers = [...currentQuestion.incorrect_answers, currentQuestion.correct_answer];
+    answers = shuffleArray(answers);
+
+    answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.className = "answer-btn";
+        button.textContent = decodeHtml(answer);
+        button.addEventListener("click", () => {
+            document.querySelectorAll(".answer-btn").forEach(btn => btn.classList.remove("selected"));
+            button.classList.add("selected");
+            selectedAnswer = answer;
+        });
+        answersDiv.appendChild(button);
+    });
+
+    document.getElementById("submit-answer-btn").style.display = "block";
+    document.getElementById("next-question-btn").style.display = "none";
+    document.getElementById("end-quiz-btn").style.display = "none";
+    resetTimer();
+    startTimer(configQuiz.timerDuration);
+}
+
+function decodeHtml(html) {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function submitAnswer() {
+    if (!selectedAnswer) {
+        alert("Veuillez sélectionner une réponse !");
         return;
     }
-    clearInterval(timerId);
-    const questionCourante = questionsQuiz[indexQuestionCourante];
-    document.getElementById("question-number").textContent = `Question ${indexQuestionCourante + 1}/${questionsQuiz.length}`;
-    document.getElementById("question-text").innerHTML = decodeHTMLEntities(questionCourante.question);
-    let reponses = [...questionCourante.incorrect_answers, questionCourante.correct_answer];
-    reponses = melangerTableau(reponses);
-    const conteneurReponses = document.getElementById("answers");
-    conteneurReponses.innerHTML = "";
-    reponses.forEach(reponse => {
-        const bouton = document.createElement("button");
-        bouton.className = "answer-btn";
-        bouton.innerHTML = decodeHTMLEntities(reponse);
-        bouton.addEventListener("click", () => gererReponse(reponse, questionCourante.correct_answer));
-        conteneurReponses.appendChild(bouton);
+
+    const currentQuestion = questions[currentQuestionIndex];
+    const feedback = document.getElementById("feedback");
+
+    document.querySelectorAll(".answer-btn").forEach(btn => {
+        btn.disabled = true;
+        if (btn.textContent === decodeHtml(currentQuestion.correct_answer)) {
+            btn.classList.add("correct");
+        } else if (btn.textContent === decodeHtml(selectedAnswer)) {
+            btn.style.backgroundColor = "#ff4d4d";
+        }
     });
-    demarrerTimer();
-    document.getElementById("next-btn").style.display = "none";
-}
 
-function decodeHTMLEntities(text) {
-    const textarea = document.createElement("textarea");
-    textarea.innerHTML = text;
-    return textarea.value;
-}
-
-function melangerTableau(tableau) {
-    for (let i = tableau.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tableau[i], tableau[j]] = [tableau[j], tableau[i]];
+    if (selectedAnswer === currentQuestion.correct_answer) {
+        score++;
+        feedback.textContent = "Correct !";
+        feedback.style.color = "#00cc00";
+    } else {
+        feedback.textContent = `Incorrect. La bonne réponse était : ${decodeHtml(currentQuestion.correct_answer)}`;
+        feedback.style.color = "#ff4d4d";
     }
-    return tableau;
+
+    feedback.style.display = "block";
+    document.getElementById("submit-answer-btn").style.display = "none";
+    document.getElementById("next-question-btn").style.display = currentQuestionIndex < questions.length - 1 ? "block" : "none";
+    document.getElementById("end-quiz-btn").style.display = currentQuestionIndex === questions.length - 1 ? "block" : "none";
 }
 
-function demarrerTimer() {
-    let tempsRestant = configQuiz.timer;
-    document.getElementById("timer").textContent = `Temps: ${tempsRestant}s`;
-    timerId = setInterval(() => {
-        tempsRestant--;
-        document.getElementById("timer").textContent = `Temps: ${tempsRestant}s`;
-        if (tempsRestant <= 0) {
-            clearInterval(timerId);
-            document.querySelectorAll(".answer-btn").forEach(b => b.disabled = true);
-            document.getElementById("next-btn").style.display = "block";
+function nextQuestion() {
+    currentQuestionIndex++;
+    selectedAnswer = null;
+    if (currentQuestionIndex < questions.length) {
+        displayQuestion();
+    }
+}
+
+function endQuiz() {
+    showScreen("results-screen");
+    const percentage = (score / questions.length) * 100;
+    const categoryId = document.getElementById("category-select").value || "random";
+    const bestScores = JSON.parse(localStorage.getItem("bestScores") || "{}");
+    if (!bestScores[categoryId] || percentage > bestScores[categoryId]) {
+        bestScores[categoryId] = percentage;
+        localStorage.setItem("bestScores", JSON.stringify(bestScores));
+    }
+    document.getElementById("final-score").textContent = `Score Final: ${score} / ${questions.length} (${percentage.toFixed(2)}%)`;
+}
+
+function displayLeaderboard() {
+    const bestScores = JSON.parse(localStorage.getItem("bestScores") || "{}");
+    const leaderboardList = document.getElementById("leaderboard-list");
+    leaderboardList.innerHTML = "";
+    for (let categoryId in bestScores) {
+        const categoryName = categories.find(cat => cat.id === parseInt(categoryId))?.name || "Aléatoire";
+        const li = document.createElement("li");
+        li.textContent = `${categoryName}: ${bestScores[categoryId].toFixed(2)}%`;
+        leaderboardList.appendChild(li);
+    }
+    showScreen("leaderboard-screen");
+}
+
+function startTimer(duration) {
+    timeLeft = duration;
+    document.getElementById("time-left").textContent = timeLeft;
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("time-left").textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            document.getElementById("submit-answer-btn").style.display = "none";
+            document.querySelectorAll(".answer-btn").forEach(btn => btn.disabled = true);
+            document.getElementById("next-question-btn").style.display = currentQuestionIndex < questions.length - 1 ? "block" : "none";
+            document.getElementById("end-quiz-btn").style.display = currentQuestionIndex === questions.length - 1 ? "block" : "none";
         }
     }, 1000);
 }
 
-function gererReponse(reponseSelectionnee, reponseCorrecte) {
-    clearInterval(timerId);
-    const boutons = document.querySelectorAll(".answer-btn");
-    boutons.forEach(bouton => {
-        bouton.disabled = true;
-        if (bouton.innerHTML === decodeHTMLEntities(reponseCorrecte)) {
-            bouton.classList.add("correct");
-        } else if (bouton.innerHTML === decodeHTMLEntities(reponseSelectionnee)) {
-            bouton.style.backgroundColor = "#ff0000";
-        }
-    });
-    if (reponseSelectionnee === reponseCorrecte) score++;
-    document.getElementById("next-btn").style.display = "block";
+function resetTimer() {
+    clearInterval(timer);
 }
 
-function passerQuestionSuivante() {
-    indexQuestionCourante++;
-    afficherQuestion();
-}
+document.getElementById("random-quiz-btn").addEventListener("click", () => {
+    document.getElementById("category-select").value = "";
+    startQuiz();
+});
 
-function sauvegarderMeilleurScore() {
-    const categorie = document.getElementById("category-select").value ? 
-        listeCategories.find(cat => cat.id == document.getElementById("category-select").value).name : "aléatoire";
-    const pourcentage = (score / questionsQuiz.length) * 100;
-    if (!configQuiz.meilleursScores[categorie] || pourcentage > configQuiz.meilleursScores[categorie].score) {
-        configQuiz.meilleursScores[categorie] = {
-            score: pourcentage,
-            pseudo: configQuiz.pseudo
-        };
-        localStorage.setItem("configQuiz", JSON.stringify(configQuiz));
+document.getElementById("select-category-btn").addEventListener("click", () => {
+    showScreen("categories-screen");
+});
+
+document.getElementById("settings-btn").addEventListener("click", () => {
+    showScreen("settings-screen");
+});
+
+document.getElementById("save-settings-btn").addEventListener("click", () => {
+    saveSettings();
+    showScreen("home-screen");
+});
+
+document.getElementById("back-to-home-from-categories-btn").addEventListener("click", () => {
+    showScreen("home-screen");
+});
+
+document.getElementById("back-to-home-from-settings-btn").addEventListener("click", () => {
+    showScreen("home-screen");
+});
+
+document.getElementById("start-category-quiz-btn").addEventListener("click", startQuiz);
+
+document.getElementById("submit-answer-btn").addEventListener("click", submitAnswer);
+
+document.getElementById("next-question-btn").addEventListener("click", nextQuestion);
+
+document.getElementById("end-quiz-btn").addEventListener("click", endQuiz);
+
+document.getElementById("restart-quiz-btn").addEventListener("click", startQuiz);
+
+document.getElementById("back-to-home-from-results-btn").addEventListener("click", () => {
+    showScreen("home-screen");
+});
+
+document.getElementById("leaderboard-btn").addEventListener("click", displayLeaderboard);
+
+document.getElementById("back-to-home-from-leaderboard-btn").addEventListener("click", () => {
+    showScreen("home-screen");
+});
+
+document.getElementById("num-questions").addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+        saveSettings();
+        showScreen("home-screen");
     }
-}
-
-function afficherResultat() {
-    afficherEcran("result-screen");
-    const pourcentage = (score / questionsQuiz.length) * 100;
-    document.getElementById("final-score").textContent = `Score final: ${score}/${questionsQuiz.length} (${pourcentage.toFixed(2)}%) - ${configQuiz.pseudo}`;
-    afficherClassement();
-}
-
-function afficherClassement() {
-    const classement = document.getElementById("leaderboard");
-    classement.innerHTML = "<h3>Classement</h3>";
-    const scores = Object.entries(configQuiz.meilleursScores).sort((a, b) => b[1].score - a[1].score);
-    if (scores.length === 0) {
-        classement.innerHTML += "<p>Aucun score enregistré.</p>";
-    } else {
-        scores.forEach(([categorie, data]) => {
-            classement.innerHTML += `<p>${categorie}: ${data.score.toFixed(2)}% - ${data.pseudo}</p>`;
-        });
-    }
-}
-
-function afficherLeaderboardDetails() {
-    const details = document.getElementById("leaderboard-details");
-    details.innerHTML = `
-        <p>Niveau de difficulté: ${configQuiz.difficulte}</p>
-        <p>Temps par question: ${configQuiz.timer} secondes</p>
-        <h3>Meilleurs scores:</h3>
-    `;
-    const scores = Object.entries(configQuiz.meilleursScores).sort((a, b) => b[1].score - a[1].score);
-    if (scores.length === 0) {
-        details.innerHTML += "<p>Aucun score enregistré.</p>";
-    } else {
-        scores.forEach(([categorie, data]) => {
-            details.innerHTML += `<p>${categorie}: ${data.score.toFixed(2)}% - ${data.pseudo}</p>`;
-        });
-    }
-}
-
-function reinitialiserQuiz() {
-    indexQuestionCourante = 0;
-    score = 0;
-    questionsQuiz = [];
-    afficherEcran("home-screen");
-}
+});

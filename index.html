@@ -7,50 +7,77 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <div id="home-screen" class="screen active">
+    <div id="home-screen" class="screen">
         <img id="logo" src="images/logo-quizy.png" alt="Logo Quizy">
         <h1>Quizy</h1>
         <button id="random-quiz-btn">Quiz Aléatoire</button>
-        <button id="category-btn">Catégories</button>
+        <button id="select-category-btn">Catégories</button>
         <button id="settings-btn">Paramètres</button>
         <button id="leaderboard-btn">Classement</button>
     </div>
-    <div id="categories-screen" class="screen">
-        <h1>Catégories</h1>
-        <select id="category-select"></select>
-        <button id="start-btn">Démarrer</button>
-    </div>
-    <div id="settings-screen" class="screen">
+
+    <div id="settings-screen" class="screen" style="display: none;">
         <h1>Paramètres</h1>
-        <input type="text" id="username" placeholder="Entrez un nom d'utilisateur" value="Invité">
-        <input type="number" id="num-questions" placeholder="Nombre de questions" value="10" min="1">
-        <input type="number" id="timer-duration" placeholder="Temps (secondes)" value="10" min="1">
-        <select id="difficulty">
+        <input type="text" id="username" placeholder="Nom d'utilisateur" value="Joueur Anonyme" aria-label="Nom d'utilisateur">
+        <select id="num-questions" aria-label="Nombre de questions">
+            <option value="5">5 questions</option>
+            <option value="10" selected>10 questions</option>
+            <option value="15">15 questions</option>
+            <option value="20">20 questions</option>
+        </select>
+        <select id="difficulty" aria-label="Niveau de difficulté">
             <option value="easy">Facile</option>
             <option value="medium">Moyen</option>
-            <option value="hard">Difficile</option>
+            <option value="hard" selected>Difficile</option>
         </select>
-        <button id="save-btn">Sauvegarder</button>
+        <select id="timer-duration" aria-label="Durée du timer">
+            <option value="30">30 secondes</option>
+            <option value="20">20 secondes</option>
+            <option value="10">10 secondes</option>
+        </select>
+        <button id="save-settings-btn">Sauvegarder</button>
+        <button id="back-to-home-from-settings-btn">Retour</button>
     </div>
-    <div id="quiz-screen" class="screen">
+
+    <div id="categories-screen" class="screen" style="display: none;">
+        <h1>Catégories</h1>
+        <select id="category-select" aria-label="Sélectionner une catégorie">
+            <option value="">Choisir une catégorie</option>
+        </select>
+        <button id="start-category-quiz-btn">Démarrer</button>
+        <button id="back-to-home-from-categories-btn">Retour</button>
+    </div>
+
+    <div id="quiz-screen" class="screen" style="display: none;">
         <h1 id="username-display"></h1>
-        <h2 id="timer"></h2>
         <h2 id="question-number"></h2>
         <p id="question-text"></p>
         <div id="answers"></div>
-        <button id="next-btn" style="display: none;">Suivant</button>
+        <p id="feedback" style="display: none;"></p>
+        <p id="timer">Temps restant: <span id="time-left">30</span>s</p>
+        <button id="submit-answer-btn">Valider</button>
+        <button id="next-question-btn" style="display: none;">Suivant</button>
+        <button id="end-quiz-btn" style="display: none;">Terminer</button>
     </div>
-    <div id="result-screen" class="screen">
+
+    <div id="results-screen" class="screen" style="display: none;">
         <h1>Résultat</h1>
         <p id="final-score"></p>
-        <div id="leaderboard"><h3>Classement</h3></div>
-        <button id="restart-btn">Recommencer</button>
+        <button id="restart-quiz-btn">Recommencer</button>
+        <button id="back-to-home-from-results-btn">Accueil</button>
     </div>
-    <div id="leaderboard-screen" class="screen">
+
+    <div id="leaderboard-screen" class="screen" style="display: none;">
         <h1>Classement</h1>
-        <div id="leaderboard-details"></div>
-        <button id="back-btn">Retour</button>
+        <ul id="leaderboard-list"></ul>
+        <button id="back-to-home-from-leaderboard-btn">Retour</button>
     </div>
+
+    <div id="loading-screen" class="screen" style="display: none;">
+        <div class="spinner"></div>
+        <p>Chargement...</p>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
