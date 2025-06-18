@@ -1,110 +1,95 @@
 body {
     margin: 0;
     padding: 20px;
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
     background-color: #d46de5;
-    min-height: 100vh;
+    color: #000063;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    min-height: 100vh;
 }
 
-div {
-    max-width: 600px;
-    width: 100%;
-    margin-bottom: 20px;
-    padding: 20px;
-    box-sizing: border-box;
+.screen {
+    background-color: #d46de5;
+    text-align: center;
+   
 }
 
 h1 {
-    font-size: 48px;
-    text-align: center;
-    color: #000063;
+    font-size: 36px;
     margin-bottom: 20px;
+    color: #000063;
 }
 
 h2 {
     font-size: 24px;
+    margin-bottom: 15px;
     color: #000063;
-    margin: 10px 0;
 }
 
-p, label {
-    font-size: 16px;
-    color: #000063;
+p {
+    font-size: 18px;
     margin: 10px 0;
+    color: #000063;
+}
+
+.form-group {
+    margin: 15px 0;
+    text-align: left;
 }
 
 label {
     display: block;
+    font-size: 16px;
     margin-bottom: 5px;
-    text-align: left;
+    color: #000063;
 }
 
 input, select {
     width: 100%;
-    margin-bottom: 15px;
     padding: 10px;
     font-size: 16px;
-    background-color: #ffffff;
     border: 2px solid #000063;
     border-radius: 5px;
     box-sizing: border-box;
 }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: #046de5;
-}
-
-button {
+.btn {
     display: inline-block;
-    margin: 5px;
     padding: 12px 24px;
     font-size: 16px;
-    background-color: #000063;
+    background-color: #046de5;
     color: #ffffff;
     border: none;
     border-radius: 5px;
+    margin: 10px 5px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
 }
 
-button:hover {
+.btn:hover {
     background-color: #000063;
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-#answers button {
+.answer-btn {
     display: block;
     width: 100%;
-    margin: 10px 0;
     padding: 12px;
-    text-align: left;
-}
-
-img {
-    display: block;
-    margin: 20px auto;
-    max-width: 150px;
-    height: auto;
-}
-
-#leaderboard-list p {
     font-size: 16px;
-    padding: 10px;
-    margin: 0;
     background-color: #ffffff;
-    border-bottom: 1px solid #000063;
+    color: #000063;
+    border: 2px solid #046de5;
+    border-radius: 5px;
+    margin: 10px 0;
+    cursor: default;
 }
 
-#leaderboard-list p:nth-child(even) {
-    background-color: #f5f5f5;
+#quiz-logo {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 150px;
 }
 
-
-        
+#answers {
+    margin: 20px 0;
+}

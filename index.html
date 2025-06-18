@@ -8,48 +8,37 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="settings-screen">
-        <h1>Quiz Settings</h1>
+    <div id="settings-screen" class="screen">
         <img src="images/logo-quizy.png" alt="Quiz Logo" id="quiz-logo">
-        <label for="username">Username: </label>
-        <input type="text" id="username" placeholder="Enter your username">
-        <br>
-        <label for="num-questions">Number of questions per quiz: </label>
-        <input type="number" id="num-questions" min="1" max="50" value="10">
-        <br>
-        <button id="save-btn">Save Settings</button>
-        <button id="category-btn">Select Category</button>
-        <button id="random-btn">Start Random Quiz</button>
-         <button id="leaderboard-btn">Leaderboard</button>
+        <h1>Quiz Settings</h1>
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+            <label for="num-questions">Number of questions:</label>
+            <input type="number" id="num-questions" min="1" max="50" value="10">
+        </div>
+        <button id="save-btn" class="btn">Save Settings</button>
+        <button id="category-btn" class="btn">Select Category</button>
     </div>
 
-    <div id="categories-screen" style="display: none;">
+    <div id="categories-screen" class="screen" style="display: none;">
         <h1>Select Category</h1>
-        <select id="category-select"></select>
-        <br>
-        <button id="start-btn">Start Quiz</button>
-        <button id="back-settings-btn">Back to Settings</button>
+        <div class="form-group">
+            <select id="category-select"></select>
+        </div>
+        <button id="start-btn" class="btn">Start Quiz</button>
+        <button id="back-settings-btn" class="btn">Back</button>
     </div>
 
-    <div id="quiz-screen" style="display: none;">
+    <div id="quiz-screen" class="screen" style="display: none;">
         <h1>Quiz</h1>
         <h2 id="username-display"></h2>
         <p id="question-number"></p>
         <p id="question-text"></p>
         <div id="answers"></div>
-        <button id="next-btn">Next Question</button>
-    </div>
-
-    <div id="result-screen" style="display: none;">
-        <h1>Quiz Results</h1>
-        <p id="score"></p>
-        <button id="back-btn">Back to Settings</button>
-    </div>
-
-    <div id="leaderboard-screen" style="display: none;">
-        <h1>Leaderboard</h1>
-        <div id="leaderboard-list"></div>
-        <button id="back-leaderboard-btn">Back to Settings</button>
+        <button id="next-btn" class="btn">Next Question</button>
     </div>
 </body>
 </html>
