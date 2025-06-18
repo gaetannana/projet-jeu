@@ -98,7 +98,63 @@ function backToSettings() {
     document.getElementById("categories-screen").style.display = "none";
     document.getElementById("settings-screen").style.display = "block";
 }
+let leaderboard = [];
+function loadLeaderboard() {
+    let saved = localStorage.getItem("leaderboard");
+    if (saved) {
+        leaderboard = JSON.parse(saved);
+    }
+}
+function saveLeaderboard() {
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
 
+}
+function saveScore() {
+   const playername = document.getElementById("username").value.trim();
+   
+ }
+function updateLeaderboard() {
+    const tbody = document.getElementById("leaderboard-body");
+    tbody.innerHTML = "";
+   leaderboard.forEach((player, index) => {
+      const row = document.createElement("tr"); 
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${player.name}</td>
+        <td>${player.score}</td>
+      `;
+      tbody.appendChild(row);
+    })
+    }
+   
+function showLeaderboard() {
+    l
+
+loadSettings();et tbody = document.getElementById("leaderboard-body");
+    tbody.innerHTML = "";
+    for (let i = 0; i < leaderboard.length; i++) {
+        let tr = document.createElement("tr");
+        let rank = document.createElement("td");
+        rank.textContent = i + 1;
+        let name = document.createElement("td");
+        name.textContent = leaderboard[i].name;
+        let score = document.createElement("td");
+        score.textContent = leaderboard[i].score;
+        tr.appendChild(rank);
+        tr.appendChild(name);
+        tr.appendChild(score);
+        tbody.appendChild(tr);
+    }
+}
+
+function toggleLeaderboard()
+ {
+    const leaderboardScreen = document.getElementById("leaderboard-screen");
+    leaderboardTable.style.display = leaderboardScreen.style.display ===  'none' ? 'table' : 'none';
+  ;
+
+document.getElementById("leaderboard-btn").textContent = leaderboardScreen.style.display === "none" ? "Hide Leaderboard" : "Show Leaderboard";
+}
 document.getElementById("save-btn").addEventListener("click", saveSettings);
 document.getElementById("category-btn").addEventListener("click", showCategories);
 document.getElementById("random-btn").addEventListener("click", startRandomQuiz);
@@ -107,7 +163,7 @@ document.getElementById("next-btn").addEventListener("click", nextQuestion);
 document.getElementById("back-settings-btn").addEventListener("click", backToSettings);
 document.getElementById("back-btn").addEventListener("click", backToSettings);
 document.getElementById("num-questions").addEventListener("keypress", (event) => {
+ document.getElementById('Leaderboardbtn).addEventListener('click', toggleLeaderboard);
     if (event.key === "Enter") saveSettings();
-});
 
-loadSettings();
+});

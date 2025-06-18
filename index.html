@@ -20,6 +20,7 @@
         <button id="save-btn">Save Settings</button>
         <button id="category-btn">Select Category</button>
         <button id="random-btn">Start Random Quiz</button>
+         <button id="leaderboard-btn">Leaderboard</button>
     </div>
 
     <div id="categories-screen" style="display: none;">
@@ -43,6 +44,16 @@
         <h1>Quiz Results</h1>
         <p id="score"></p>
         <button id="back-btn">Back to Settings</button>
+    </div>
+    <div id="leaderboard-screen" ></div>
+        <table id="leaderboard">
+            <thead>
+                <th>Rank</th>
+                <th>Player</th> 
+                <th>Score</th>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+        </table>
     </div>
 </body>
 </html>
