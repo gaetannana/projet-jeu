@@ -1,99 +1,109 @@
-var settings = { username: "Player", numQuestions: 10 };
-var questions = [];
-var currentIndex = 0;
+let settings = { playerName: "Joueur Anonyme", questionCount: 10 };
+let categories = [];
+let questions = [];
+let currentIndex = 0;
 
-function loadSettings() {
-    var saved = localStorage.getItem("quizSettings");
-    if (saved) {
-        settings = JSON.parse(saved);
-        document.getElementById("username").value = settings.username;
-        document.getElementById("num-questions").value = settings.numQuestions;
+document.addEventListener("DOMContentLoaded", function() {
+    loadSettings();
+    getCategories();
+});
+
+function showScreen(screenId) {
+    document.getElementById("settings-screen").style.display = "none";
+    document.getElementById("categories-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById(screenId).style.display = "block";
+
+    if (screenId === "categories-screen") {
+        saveSettings();
+        showCategories();
     }
 }
 
 function saveSettings() {
-    var username = document.getElementById("username").value;
-    if (username === "") {
-        username = "Player";
+    let name = document.getElementById("playerName").value;
+    if (name === "") {
+        name = "Joueur Anonyme";
     }
-    var numQuestions = parseInt(document.getElementById("num-questions").value);
-    if (numQuestions < 1 || isNaN(numQuestions)) {
-        numQuestions = 10;
+    let count = parseInt(document.getElementById("questionCount").value);
+    if (isNaN(count) || count < 1) {
+        count = 10;
     }
-    settings.username = username;
-    settings.numQuestions = numQuestions;
+    settings.playerName = name;
+    settings.questionCount = count;
     localStorage.setItem("quizSettings", JSON.stringify(settings));
-    alert("Settings saved!");
 }
 
-function showCategories() {
-    document.getElementById("settings-screen").style.display = "none";
-    document.getElementById("categories-screen").style.display = "block";
-    getCategories();
+function loadSettings() {
+    let saved = localStorage.getItem("quizSettings");
+    if (saved) {
+        settings = JSON.parse(saved);
+        document.getElementById("playerName").value = settings.playerName;
+        document.getElementById("questionCount").value = settings.questionCount;
+    }
 }
 
 async function getCategories() {
-    var response = await fetch("https://opentdb.com/api_category.php");
-    var data = await response.json();
-    var select = document.getElementById("category-select");
+    let response = await fetch("https://opentdb.com/api_category.php");
+    let data = await response.json();
+    categories = data.trivia_categories;
+}
+
+function showCategories() {
+    let select = document.getElementById("category-select");
     select.innerHTML = "";
-    var defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent = "Select a category";
-    select.appendChild(defaultOption);
-    for (var i = 0; i < data.trivia_categories.length; i++) {
-        var option = document.createElement("option");
-        option.value = data.trivia_categories[i].id;
-        option.textContent = data.trivia_categories[i].name;
+    let option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Choisir une catégorie";
+    select.appendChild(option);
+    for (let i = 0; i < categories.length; i++) {
+        option = document.createElement("option");
+        option.value = categories[i].id;
+        option.textContent = categories[i].name;
         select.appendChild(option);
     }
 }
 
 function startQuiz() {
-    var category = document.getElementById("category-select").value;
-    var url = "https://opentdb.com/api.php?amount=" + settings.numQuestions + "&type=multiple";
-    if (category !== "") {
-        url = url + "&category=" + category;
+    let categoryId = document.getElementById("category-select").value;
+    let url = "https://opentdb.com/api.php?amount=" + settings.questionCount;
+    if (categoryId !== "") {
+        url = url + "&category=" + categoryId;
     }
     getQuestions(url);
 }
 
 async function getQuestions(url) {
-    var response = await fetch(url);
-    var data = await response.json();
+    let response = await fetch(url);
+    let data = await response.json();
     if (data.response_code === 0) {
         questions = data.results;
         currentIndex = 0;
-        document.getElementById("categories-screen").style.display = "none";
-        document.getElementById("quiz-screen").style.display = "block";
-        document.getElementById("username-display").textContent = "Player: " + settings.username;
+        showScreen("quiz-screen");
+        document.getElementById("username-display").textContent = "Joueur : " + settings.playerName;
         showQuestion();
     } else {
-        alert("Error loading questions.");
+        alert("Erreur lors du chargement des questions !");
     }
 }
 
 function showQuestion() {
-    var question = questions[currentIndex];
+    let question = questions[currentIndex];
     document.getElementById("question-number").textContent = "Question " + (currentIndex + 1);
     document.getElementById("question-text").textContent = question.question;
-    var answers = [];
-    for (var i = 0; i < question.incorrect_answers.length; i++) {
-        answers[i] = question.incorrect_answers[i];
-    }
+    let answers = question.incorrect_answers;
     answers[answers.length] = question.correct_answer;
-    for (i = answers.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = answers[i];
+    for (let i = answers.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = answers[i];
         answers[i] = answers[j];
         answers[j] = temp;
     }
-    var answersDiv = document.getElementById("answers");
+    let answersDiv = document.getElementById("answers");
     answersDiv.innerHTML = "";
-    for (i = 0; i < answers.length; i++) {
-        var button = document.createElement("button");
+    for (let i = 0; i < answers.length; i++) {
+        let button = document.createElement("button");
         button.textContent = answers[i];
-        button.className = "answer-btn";
         answersDiv.appendChild(button);
     }
 }
@@ -103,21 +113,20 @@ function nextQuestion() {
     if (currentIndex < questions.length) {
         showQuestion();
     } else {
-        document.getElementById("quiz-screen").style.display = "none";
-        document.getElementById("settings-screen").style.display = "block";
+        showScreen("settings-screen");
     }
 }
 
 function goBack() {
-    document.getElementById("categories-screen").style.display = "none";
-    document.getElementById("settings-screen").style.display = "block";
+    showScreen("settings-screen");
 }
 
 document.getElementById("save-btn").addEventListener("click", function() {
     saveSettings();
+    showScreen("categories-screen");
 });
 document.getElementById("category-btn").addEventListener("click", function() {
-    showCategories();
+    showScreen("categories-screen");
 });
 document.getElementById("start-btn").addEventListener("click", function() {
     startQuiz();
@@ -128,10 +137,9 @@ document.getElementById("next-btn").addEventListener("click", function() {
 document.getElementById("back-settings-btn").addEventListener("click", function() {
     goBack();
 });
-document.getElementById("num-questions").addEventListener("keypress", function(event) {
+document.getElementById("questionCount").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
         saveSettings();
+        showScreen("categories-screen");
     }
 });
-
-loadSettings();
