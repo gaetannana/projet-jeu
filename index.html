@@ -3,43 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Game</title>
+    <title>Quizy</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <script src="script.js" defer></script>
 </head>
 <body>
+    <div id="home-screen" class="screen active">
+        <img id="logo" src="images/logo-quizy.png" alt="Logo Quizy">
+        <h1>Quizy</h1>
+        <button id="random-quiz-btn">Quiz Aléatoire</button>
+        <button id="category-btn">Catégories</button>
+        <button id="settings-btn">Paramètres</button>
+        <button id="leaderboard-btn">Classement</button>
+    </div>
+    <div id="categories-screen" class="screen">
+        <h1>Catégories</h1>
+        <select id="category-select"></select>
+        <button id="start-btn">Démarrer</button>
+    </div>
     <div id="settings-screen" class="screen">
-        <img src="images/logo-quizy.png" alt="Quiz Logo" id="quiz-logo">
-        <h1>Quiz Settings</h1>
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" placeholder="Enter your username">
-        </div>
-        <div class="form-group">
-            <label for="num-questions">Number of questions:</label>
-            <input type="number" id="num-questions" min="1" max="50" value="10">
-        </div>
-        <button id="save-btn" class="btn">Save Settings</button>
-        <button id="category-btn" class="btn">Select Category</button>
-        <button id="random-quiz-btn" class="btn">Random Quiz</button>
+        <h1>Paramètres</h1>
+        <input type="text" id="username" placeholder="Entrez un nom d'utilisateur" value="Invité">
+        <input type="number" id="num-questions" placeholder="Nombre de questions" value="10" min="1">
+        <input type="number" id="timer-duration" placeholder="Temps (secondes)" value="10" min="1">
+        <select id="difficulty">
+            <option value="easy">Facile</option>
+            <option value="medium">Moyen</option>
+            <option value="hard">Difficile</option>
+        </select>
+        <button id="save-btn">Sauvegarder</button>
     </div>
-
-    <div id="categories-screen" class="screen" style="display: none;">
-        <h1>Select Category</h1>
-        <div class="form-group">
-            <select id="category-select"></select>
-        </div>
-        <button id="start-btn" class="btn">Start Quiz</button>
-        <button id="back-settings-btn" class="btn">Back</button>
-    </div>
-
-    <div id="quiz-screen" class="screen" style="display: none;">
-        <h1>Quiz</h1>
-        <h2 id="username-display"></h2>
-        <p id="question-number"></p>
+    <div id="quiz-screen" class="screen">
+        <h1 id="username-display"></h1>
+        <h2 id="timer"></h2>
+        <h2 id="question-number"></h2>
         <p id="question-text"></p>
         <div id="answers"></div>
-        <button id="next-btn" class="btn">Next Question</button>
+        <button id="next-btn" style="display: none;">Suivant</button>
     </div>
+    <div id="result-screen" class="screen">
+        <h1>Résultat</h1>
+        <p id="final-score"></p>
+        <div id="leaderboard"><h3>Classement</h3></div>
+        <button id="restart-btn">Recommencer</button>
+    </div>
+    <div id="leaderboard-screen" class="screen">
+        <h1>Classement</h1>
+        <div id="leaderboard-details"></div>
+        <button id="back-btn">Retour</button>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
